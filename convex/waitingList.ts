@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { internalMutation, mutation, query } from "./_generated/server";
 import { DURATIONS, TICKET_STATUS, WAITING_LIST_STATUS } from "./constants";
 import { internal } from "./_generated/api";
+import { Id } from "./_generated/dataModel";
 
 export const getQueuePosition = query({
   args: { eventId: v.id("events"), userId: v.string() },
@@ -119,6 +120,52 @@ export const proccessQueue = mutation({
         internal.waitingList.expiredOffer,
         { waitingListId: user._id, eventId }
       );
+    }
+  },
+});
+
+function groupByEvent(
+  offers: Array<{ eventId: Id<"events">; _id: Id<"waitingList"> }>
+) {
+  return offers.reduce(
+    (acc, offer) => {
+      const eventId = offer.eventId;
+      if (!acc[eventId]) {
+        acc[eventId] = [];
+      }
+      acc[eventId].push(offer);
+      return acc;
+    },
+    {} as Record<Id<"events">, typeof offers>
+  );
+}
+
+export const cleanupExpiredOffers = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    // Find all expired but not yet cleaned up offers
+    const expiredOffers = await ctx.db
+      .query("waitingList")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("status"), WAITING_LIST_STATUS.OFFERED),
+          q.lt(q.field("offerExpiresAt"), now)
+        )
+      )
+      .collect();
+
+    const grouped = groupByEvent(expiredOffers);
+    for (const [eventId, offers] of Object.entries(grouped)) {
+      await Promise.all(
+        offers.map((offer) =>
+          ctx.db.patch(offer._id, {
+            status: WAITING_LIST_STATUS.EXPIRED,
+          })
+        )
+      );
+
+      await proccessQueue(ctx, { eventId: eventId as Id<"events"> });
     }
   },
 });
