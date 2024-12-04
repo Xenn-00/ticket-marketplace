@@ -4,9 +4,6 @@ import { cn } from "@/lib/utils";
 import { Dispatch, ReactNode, SetStateAction } from "react";
 import { Drawer } from "vaul";
 import { Dialog, DialogContent, DialogTitle } from "./dialog";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-
-export default () => <VisuallyHidden.Root />;
 
 interface ModalProps {
   children?: ReactNode;
@@ -85,9 +82,7 @@ export const Modal = ({
       }}
     >
       <DialogContent>
-        <VisuallyHidden.Root>
-          <DialogTitle className="sr-only">Dialog</DialogTitle>
-        </VisuallyHidden.Root>
+        <DialogTitle className="sr-only">Dialog</DialogTitle>
         {children}
       </DialogContent>
     </Dialog>

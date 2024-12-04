@@ -31,6 +31,17 @@ function SellerDashboard() {
     userId: user?.id ?? "",
   });
 
+  const fetchAccountStatus = async () => {
+    if (stripeConnectId) {
+      try {
+        const status = await GetStripeConnectAccountStatus(stripeConnectId);
+        setAccountStatus(status);
+      } catch (error) {
+        console.error("Error fetching account status: ", error);
+      }
+    }
+  };
+
   useEffect(() => {
     if (stripeConnectId) {
       fetchAccountStatus();
@@ -53,17 +64,6 @@ function SellerDashboard() {
     } catch (error) {
       console.error("Error accessing Stripe Connect portal: ", error);
       setError(true);
-    }
-  };
-
-  const fetchAccountStatus = async () => {
-    if (stripeConnectId) {
-      try {
-        const status = await GetStripeConnectAccountStatus(stripeConnectId);
-        setAccountStatus(status);
-      } catch (error) {
-        console.error("Error fetching account status: ", error);
-      }
     }
   };
 
