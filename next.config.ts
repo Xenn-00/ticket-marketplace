@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
         hostname: "brave-spider-640.convex.cloud",
         protocol: "https",
       },
+      {
+        hostname: "pastel-jay-955.convex.cloud",
+        protocol: "https"
+      },
     ],
   },
 };
