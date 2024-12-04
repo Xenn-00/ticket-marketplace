@@ -9,7 +9,7 @@
  */
 
 import type * as constants from "../constants.js";
-import type * as cron from "../cron.js";
+import type * as crons from "../crons.js";
 import type * as events from "../events.js";
 import type * as storage from "../storage.js";
 import type * as tickets from "../tickets.js";
@@ -31,7 +31,7 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   constants: typeof constants;
-  cron: typeof cron;
+  crons: typeof crons;
   events: typeof events;
   storage: typeof storage;
   tickets: typeof tickets;
@@ -123,6 +123,57 @@ export declare const components: {
         "internal",
         { key?: string; name: string },
         null
+      >;
+    };
+  };
+  crons: {
+    public: {
+      del: FunctionReference<
+        "mutation",
+        "internal",
+        { identifier: { id: string } | { name: string } },
+        null
+      >;
+      get: FunctionReference<
+        "query",
+        "internal",
+        { identifier: { id: string } | { name: string } },
+        {
+          args: Record<string, any>;
+          functionHandle: string;
+          id: string;
+          name?: string;
+          schedule:
+            | { kind: "interval"; ms: number }
+            | { cronspec: string; kind: "cron" };
+        } | null
+      >;
+      list: FunctionReference<
+        "query",
+        "internal",
+        {},
+        Array<{
+          args: Record<string, any>;
+          functionHandle: string;
+          id: string;
+          name?: string;
+          schedule:
+            | { kind: "interval"; ms: number }
+            | { cronspec: string; kind: "cron" };
+        }>
+      >;
+      register: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          args: Record<string, any>;
+          functionHandle: string;
+          name?: string;
+          schedule:
+            | { kind: "interval"; ms: number }
+            | { cronspec: string; kind: "cron" };
+        },
+        string
       >;
     };
   };
